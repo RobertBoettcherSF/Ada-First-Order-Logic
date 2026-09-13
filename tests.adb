@@ -38,7 +38,7 @@ procedure Tests is
          when others => False);
 
    Interp : Test_Interp;
-   Env    : Assignment := (others => 1); -- Default environment (all vars = 1)
+   Env    : Assignment := [others => 1]; -- Default environment (all vars = 1)
 
    T_x : constant Term_Access := Make_Variable ('x');
    T_y : constant Term_Access := Make_Variable ('y');
@@ -200,6 +200,7 @@ begin
       begin
          declare
             Bad : constant Formula_Access := Make_Not (null);
+            pragma Unreferenced (Bad);
          begin
             Check ("13.1 Null formula rejection", False);
          end;
@@ -212,6 +213,7 @@ begin
       begin
          declare
             Bad : constant Term_Access := Make_Function ('f', null);
+            pragma Unreferenced (Bad);
          begin
             Check ("13.2 Null term rejection", False);
          end;
