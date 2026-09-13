@@ -19,6 +19,8 @@ procedure Tests is
    -- Concrete Interpretation for testing
    type Test_Interp is new Interpretation with null record;
    
+   -- Suppress benign unused warnings for formal parameters required by the interface
+   pragma Warnings (Off, "-gnatwu");
    overriding function Eval_Constant (I : Test_Interp; Name : Character) return Domain_Element is
       (case Name is
          when 'c' => 2,
@@ -36,6 +38,7 @@ procedure Tests is
          when 'P' => Arg1 = 2,           -- Unary: True if Arg1 == 2
          when 'G' => Arg1 > Arg2,        -- Binary: Greater than
          when others => False);
+   pragma Warnings (On, "-gnatwu");
 
    Interp : Test_Interp;
    Env    : Assignment := [others => 1]; -- Default environment (all vars = 1)
@@ -194,36 +197,32 @@ begin
 
    -- TEST 13: Edge Cases / Precondition Violations
    Put_Line ("TEST 13 - Edge Cases and Robustness");
-   declare
-      Caught : Boolean := False;
+   
    begin
+      declare
+         Bad : constant Formula_Access := Make_Not (null);
+         pragma Unreferenced (Bad);
       begin
-         declare
-            Bad : constant Formula_Access := Make_Not (null);
-            pragma Unreferenced (Bad);
-         begin
-            Check ("13.1 Null formula rejection", False);
-         end;
-      exception
-         when others => Caught := True;
+         Check ("13.1 Precondition catches null in Make_Not", False);
       end;
-      Check ("13.1 Precondition catches null in Make_Not", Caught);
-      
-      Caught := False;
-      begin
-         declare
-            Bad : constant Term_Access := Make_Function ('f', null);
-            pragma Unreferenced (Bad);
-         begin
-            Check ("13.2 Null term rejection", False);
-         end;
-      exception
-         when others => Caught := True;
-      end;
-      Check ("13.2 Precondition catches null in Make_Function", Caught);
-
-      Check ("13.3 Has_Quantifier on null", not Has_Quantifier (null));
+   exception
+      when others => 
+         Check ("13.1 Precondition catches null in Make_Not", True);
    end;
+   
+   begin
+      declare
+         Bad : constant Term_Access := Make_Function ('f', null);
+         pragma Unreferenced (Bad);
+      begin
+         Check ("13.2 Precondition catches null in Make_Function", False);
+      end;
+   exception
+      when others => 
+         Check ("13.2 Precondition catches null in Make_Function", True);
+   end;
+
+   Check ("13.3 Has_Quantifier on null", not Has_Quantifier (null));
 
    Put_Line ("");
    Put_Line ("=== " & Natural'Image (Pass_Count) & " passed, "
