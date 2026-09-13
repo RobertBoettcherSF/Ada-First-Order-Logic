@@ -130,6 +130,9 @@ package First_Order_Logic is
    function Is_Prenex_Normal_Form (F : Formula_Access) return Boolean
      with Pre => F /= null;
 
+   --  Checks if a formula contains any quantifiers
+   function Has_Quantifier (F : Formula_Access) return Boolean;
+
    --  Substitutes all free occurrences of Var in T with a deep copy of Replacement
    function Substitute_Term (T : Term_Access; Var : Variable_Name; Replacement : Term_Access) return Term_Access
      with Pre => T /= null and Replacement /= null;
