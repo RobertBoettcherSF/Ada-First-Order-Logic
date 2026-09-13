@@ -1,19 +1,10 @@
-GNAT    := gnatmake
-FLAGS   := -gnatwa -gnat2022 -gnata
-OBJ_DIR := obj
-BIN_DIR := bin
+project First_Order_Logic is
+   for Source_Dirs use (".");
+   for Object_Dir  use "obj";
+   for Exec_Dir    use "bin";
+   for Main        use ("tests.adb");
 
-.PHONY: all test clean
-
-all: $(BIN_DIR)/tests
-
-$(BIN_DIR)/tests: *.ads *.adb *.gpr
-	mkdir -p $(OBJ_DIR) $(BIN_DIR)
-	$(GNAT) $(FLAGS) -Pfirst_order_logic.gpr
-
-test: all
-	@echo "Running tests..."
-	@$(BIN_DIR)/tests
-
-clean:
-	rm -rf $(OBJ_DIR) $(BIN_DIR)
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnatwa", "-gnat2022", "-gnata");
+   end Compiler;
+end First_Order_Logic;
